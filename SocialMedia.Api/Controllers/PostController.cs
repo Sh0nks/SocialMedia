@@ -29,5 +29,12 @@ namespace SocialMedia.Api.Controllers
         {
             return await _repository.GetPost(id);
         }
+
+        [HttpPost]
+        public async Task<ActionResult<Post>> Create(Post post)
+        {
+            await _repository.Create(post);
+            return Created($"{post.Id}", post);
+        }
     }
 }
