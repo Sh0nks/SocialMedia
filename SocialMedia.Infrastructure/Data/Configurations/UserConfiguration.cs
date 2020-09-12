@@ -10,7 +10,7 @@ namespace SocialMedia.Infrastruncture.Data.Configurations
         {
             builder.ToTable("Usuario");
             builder.HasKey(e => e.Id);
-            builder.Property(e => e.Id).HasColumnName("IdUsario");
+            builder.Property(e => e.Id).HasColumnName("IdUsuario");
             builder.Property(e => e.LastName).HasColumnName("Apellidos")
                 .IsRequired()
                 .HasMaxLength(50)
@@ -23,14 +23,16 @@ namespace SocialMedia.Infrastruncture.Data.Configurations
             
             builder.Property(e => e.DateBorn).HasColumnType("date").HasColumnName("FechaNacimiento");
             
-            builder.Property(e => e.FirstName)
+            builder.Property(e => e.FirstName).HasColumnName("Nombres")
                 .IsRequired()
                 .HasMaxLength(50)
                 .IsUnicode(false);
             
-            builder.Property(e => e.Phone)
+            builder.Property(e => e.Phone).HasColumnName("Telefono")
                 .HasMaxLength(10)
                 .IsUnicode(false);
+
+            builder.Property(e => e.IsActive).HasColumnName("Activo");
         }
     }
 }
