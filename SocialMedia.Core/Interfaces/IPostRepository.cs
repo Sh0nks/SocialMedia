@@ -10,5 +10,8 @@ namespace SocialMedia.Core.Interfaces
         Task<Post> GetPost(int i);
 
         Task<Post> Create(Post post);
+        Task<bool> Update(Post post);
+        Task<bool> Delete(int id);
+        
     }
 }
