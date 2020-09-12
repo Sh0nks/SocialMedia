@@ -2,11 +2,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SocialMedia.Core.Entities;
+using SocialMedia.Core.Interfaces;
 using SocialMedia.Infrastruncture.Data;
 
-namespace SocialMedia.Infrastruncture.Validators
+namespace SocialMedia.Infrastructure.Repositories
 {
-    public class UserRepository
+    public class UserRepository: IUserRepository
     {
         private readonly SocialMediaContext _context;
 

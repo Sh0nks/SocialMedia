@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SocialMedia.Core.Interfaces;
+using SocialMedia.Core.Services;
 using SocialMedia.Infrastructure.Repositories;
 using SocialMedia.Infrastruncture.Data;
 using SocialMedia.Infrastruncture.Filters;
@@ -31,6 +32,8 @@ namespace SocialMedia.Api
             });
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddTransient<IPostRepository, PostRepository>();
+            services.AddTransient<IPostService, PostService>();
+            services.AddTransient<IUserRepository, UserRepository>();
             services.AddDbContext<SocialMediaContext>(
                 options => options.UseSqlServer(Configuration.GetConnectionString("default"))
             );

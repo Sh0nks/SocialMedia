@@ -13,26 +13,26 @@ namespace SocialMedia.Api.Controllers
     [ApiController]
     public class PostController : ControllerBase
     {
-        private readonly IPostRepository _repository;
+        private readonly IPostService _service;
         private readonly IMapper _mapper;
 
-        public PostController(IPostRepository repository, IMapper mapper)
+        public PostController(IPostService service, IMapper mapper)
         {
             _mapper = mapper;
-            _repository = repository;
+            _service = service;
         }
         
         [HttpGet]
         public async Task<ActionResult> Get()
         { 
-            IEnumerable<Post> posts = await _repository.GetPosts();
+            IEnumerable<Post> posts = await _service.GetPosts();
             return Ok(new ApiResponse<IEnumerable<PostDto>>(_mapper.Map<List<PostDto>>(posts)));
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(int id)
         {
-            Post post = await _repository.GetPost(id);
+            Post post = await _service.Get(id);
             return Ok(new ApiResponse<PostDto>(_mapper.Map<PostDto>(post)));
         }
 
@@ -40,7 +40,7 @@ namespace SocialMedia.Api.Controllers
         public async Task<ActionResult> Create(PostDto postDto)
         {
             Post post = _mapper.Map<Post>(postDto); 
-            await _repository.Create(post);
+            await _service.Create(post);
             return Created($"{post.Id}", new ApiResponse<PostDto>(_mapper.Map<PostDto>(post)));
         }
 
@@ -49,14 +49,14 @@ namespace SocialMedia.Api.Controllers
         {
             Post post = _mapper.Map<Post>(postDto);
             post.Id = id;
-            await _repository.Update(post);
+            await _service.Update(post);
            return Ok(new ApiResponse<PostDto>(postDto));
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            bool deleted = await _repository.Delete(id);
+            bool deleted = await _service.Delete(id);
             return Ok(new ApiResponse<bool>(deleted));
         }
         

@@ -1,7 +1,10 @@
+using System.Threading.Tasks;
+using SocialMedia.Core.Entities;
+
 namespace SocialMedia.Core.Interfaces
 {
-    public class IUserRepository
+    public interface IUserRepository
     {
-        
+        Task<User> GetUser(int id);
     }
 }
