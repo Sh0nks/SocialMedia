@@ -6,30 +6,28 @@ using SocialMedia.Core.Interfaces;
 
 namespace SocialMedia.Core.Services
 {
-    public class PostService: IPostService    
+    public class PostService: IPostService
     {
-        private readonly IRepository<Post> _repository;
-        private readonly IRepository<User> _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public PostService(IRepository<Post> repository, IRepository<User> userRepository)
+        public PostService(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<Post>> GetPosts()
         {
-            return await _repository.GetAll();
+            return await _unitOfWork.PostRepository.GetAll();
         }
 
         public async Task<Post> Get(int id)
         {
-            return await _repository.GetById(id);
+            return await _unitOfWork.PostRepository.GetById(id);
         }
 
         public async Task Create(Post post)
         {
-            User user = await _userRepository.GetById(post.UserId);
+            User user = await _unitOfWork.UserRepository.GetById(post.UserId);
             if (user == null)
             {
                 throw new Exception("User does not exists");
@@ -39,18 +37,18 @@ namespace SocialMedia.Core.Services
             {
                 throw new Exception("Inapropiedted content");
             }
-            await _repository.Create(post);
+            await _unitOfWork.PostRepository.Create(post);
         }
 
         public async Task<bool> Update(Post post)
         {
-            await _repository.Update(post);
+            await _unitOfWork.PostRepository.Update(post);
             return true;
         }
 
         public async Task<bool> Delete(int id)
         {
-            await _repository.Delete(id);
+            await _unitOfWork.PostRepository.Delete(id);
             return true;
         }
     }
