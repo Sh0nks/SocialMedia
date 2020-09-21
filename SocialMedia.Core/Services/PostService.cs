@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using SocialMedia.Core.Entities;
+using SocialMedia.Core.Exceptions;
 using SocialMedia.Core.Interfaces;
 
 namespace SocialMedia.Core.Services
@@ -15,9 +17,9 @@ namespace SocialMedia.Core.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<Post>> GetPosts()
+        public IEnumerable<Post> GetPosts()
         {
-            return await _unitOfWork.PostRepository.GetAll();
+            return _unitOfWork.PostRepository.GetAll();
         }
 
         public async Task<Post> Get(int id)
@@ -33,16 +35,28 @@ namespace SocialMedia.Core.Services
                 throw new Exception("User does not exists");
             }
 
+            IEnumerable<Post> posts = await _unitOfWork.PostRepository.GetPostsByUser(post.UserId);
+            if (posts.Count() < 10)
+            {
+                Post lastPost = posts.LastOrDefault();
+                int daysLapsed = (int)((DateTime.Now - lastPost.Date).TotalDays);
+                if (daysLapsed < 7)
+                {
+                   throw new BussinesExecption("You are not able to publish a post yet");
+                }
+            }
             if (post.Description.Contains("Sexo"))
             {
-                throw new Exception("Inapropiedted content");
+                throw new BussinesExecption("Inapropiedted content");
             }
             await _unitOfWork.PostRepository.Create(post);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<bool> Update(Post post)
         {
-            await _unitOfWork.PostRepository.Update(post);
+            _unitOfWork.PostRepository.Update(post);
+            await _unitOfWork.SaveChangesAsync();
             return true;
         }
 
