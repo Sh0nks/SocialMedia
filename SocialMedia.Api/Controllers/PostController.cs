@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +9,7 @@ using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
 using SocialMedia.Core.Interfaces;
 using SocialMedia.Core.QueryFilters;
+using SocialMedia.Infrastruncture.Interfaces;
 
 namespace SocialMedia.Api.Controllers
 {
@@ -20,27 +19,36 @@ namespace SocialMedia.Api.Controllers
     {
         private readonly IPostService _service;
         private readonly IMapper _mapper;
+        private readonly IUriService _uriService;
 
-        public PostController(IPostService service, IMapper mapper)
+        public PostController(IPostService service, IMapper mapper, IUriService uriService)
         {
             _mapper = mapper;
             _service = service;
+            _uriService = uriService;
         }
         
-        [HttpGet]
+        [HttpGet(Name = "Post-List")]
         public ActionResult Get([FromQuery] PostQueryFilter filters)
         {
+           
             PagedList<Post> posts = _service.GetPosts(filters);
-            var pagginationData = new
+            var uri = _uriService.getPostPaginatedUri(filters, Url.RouteUrl("Post-List"));
+            var pagginationData = new Metadata
             {
-                posts.TotalPage,
-                posts.TotalCount,
-                posts.NextPageNumber,
-                posts.PreviousPageNumber,
-                posts.CurrentPage
+                Total = posts.TotalPage,
+                TotalCount = posts.TotalCount,
+                HasNextPage = posts.HasNextPage,
+                HasPreviousPage = posts.HasPreviousPage,
+                NextPageUrl = uri.ToString()
             };
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(pagginationData));
-            return Ok(new ApiResponse<IEnumerable<PostDto>>(_mapper.Map<List<PostDto>>(posts)));
+            ApiResponse<IEnumerable<PostDto>> response = new ApiResponse<IEnumerable<PostDto>>(
+                _mapper.Map<List<PostDto>>(posts))
+            {
+                meta = pagginationData
+            };
+            return Ok(response);
         }
 
         [HttpGet("{id}")]

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using SocialMedia.Core.Collections;
 using SocialMedia.Core.Entities;
 using SocialMedia.Core.Exceptions;
@@ -13,14 +14,19 @@ namespace SocialMedia.Core.Services
     public class PostService: IPostService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly PaginationOptions _paginationOptions;
 
-        public PostService(IUnitOfWork unitOfWork)
+        public PostService(IUnitOfWork unitOfWork, IOptions<PaginationOptions> options)
         {
             _unitOfWork = unitOfWork;
+            _paginationOptions = options.Value;
         }
 
         public PagedList<Post> GetPosts(PostQueryFilter filters)
         {
+             filters.PageNumber = filters.PageNumber == 0 ? _paginationOptions.DefaultPageNumber : filters.PageNumber;
+             filters.PageSize = filters.PageSize == 0 ? _paginationOptions.DefaultPageSize : filters.PageSize;
+                        
             
             IEnumerable<Post> posts = _unitOfWork.PostRepository.GetAll();
             if (filters.UserId != null)
