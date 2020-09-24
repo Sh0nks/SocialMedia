@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using SocialMedia.Core.Interfaces;
 using SocialMedia.Core.Services;
 using SocialMedia.Infrastructure.Repositories;
@@ -52,6 +53,9 @@ namespace SocialMedia.Api
                 options => options.UseSqlServer(Configuration.GetConnectionString("default"))
             );
             services.Configure<PaginationOptions>(Configuration.GetSection("Pagination"));
+            services.AddSwaggerGen(options => { options.SwaggerDoc("v1", new OpenApiInfo() {Title = "Social Media Api", Version = "v1"});
+            });
+            
             services.AddMvc(options =>
             {
                 options.Filters.Add<ValidationFilter>();
@@ -70,6 +74,12 @@ namespace SocialMedia.Api
 
             app.UseHttpsRedirection();
 
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Social Media Api");
+            });
+            
             app.UseRouting();
 
             app.UseAuthorization();
